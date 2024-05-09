@@ -1,0 +1,103 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: grpc-redis-pub-sub-gw
+  namespace: dev
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: grpc-web
+    hosts:
+    - "*"
+    tls:
+      httpsRedirect: true 
+  - port:
+      number: 443
+      name: https-443
+      protocol: grpc-web
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: grpc-redis-pub-sub-vs
+  namespace: dev
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - grpc-redis-pub-sub-gw
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: grpc-redis-pub-sub.dev.svc.cluster.local
+        port:
+          number: 8080
+      weight: 100
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: grpc-redis-pub-sub-dr
+  namespace: dev
+spec:
+  host: grpc-redis-pub-sub.dev.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      http:
+        idleTimeout: "7200s"
+      tcp:
+        connectTimeout: "20s"
+        maxConnections: 10000
+        tcpKeepalive:
+          probes: 9
+          time: "20s"
+          interval: "75s"
+---
+apiVersion: "security.istio.io/v1beta1"
+kind: "RequestAuthentication"
+metadata:
+  name: "grpc-redis-pub-sub-authn"
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: grpc-redis-pub-sub
+  jwtRules:
+    - issuer: "https://cognito-idp.us-east-1.amazonaws.com/<cognito-user-pool-id>"
+      forwardOriginalToken: true
+      fromHeaders:
+      - name: Authorization
+        prefix: "Bearer "
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: "grpc-redis-pub-sub-authz"
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: grpc-redis-pub-sub
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        requestPrincipals: ["https://cognito-idp.us-east-1.amazonaws.com/<cognito-user-pool-id>/*"]
+    # to:
+    # - operation:
+    #     paths: ["/"]
+    # when:
+    # - key: request.auth.claims[iss]
+    #   values: ["https://cognito-idp.us-east-1.amazonaws.com/<cognito-user-pool-id>"]
+      

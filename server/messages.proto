@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package myservice;
+
+option go_package = "grpc_stream-medium/server/myservice";
+
+message MessageRequest {
+  repeated string queue_names = 1;
+}
+
+message MessageResponse {
+  string message = 1;
+}
+
+service MessageStream {
+  rpc SendMessage(stream MessageRequest) returns (stream MessageResponse);
+}

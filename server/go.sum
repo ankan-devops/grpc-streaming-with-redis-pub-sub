@@ -1,0 +1,6 @@
+github.com/gin-gonic/gin v1.7.6 h1:Ma2JlolDP9KCHuHTrW58EIIxVUQKxSxzuCKguCYyFas= 
+github.com/gin-gonic/gin v1.7.6/go.mod h1:jD2toBW3GZUr5UMcdrwQA10I7RuaFOl/SGeDjXkfUtY=
+github.com/go-redis/redis/v8 v8.11.0 h1:O1Td0mQ8UFChQ3N9zFQqo6kTU2cJ+/it88gDB+zg0wo=
+github.com/go-redis/redis/v8 v8.11.0/go.mod h1:DLomh7y2e3ggQXQLd1YgmvIfecPJoFl7WU5SOQ/r06M=
+go.uber.org/fx v1.19.0 h1:QetyAKH/ya3Avfg+s84DljRV+svcSAo8k+2y+B+ZaRQ= 
+go.uber.org/fx v1.19.0/go.mod h1:bGK+AEy7XUwTBkqCsK/vDyFF0JJOA6X5KWpNC0e6qTA=
